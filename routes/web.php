@@ -113,6 +113,20 @@ Route::get('/layout-test-expert', function () {
     return view('layout-test-expert');
 });
 
+// Test webhook dashboard without admin middleware
+Route::get('/test-webhook-dashboard', function () {
+    $controller = new \App\Http\Controllers\Admin\WebhookDashboardController();
+    $request = new \Illuminate\Http\Request();
+    return $controller->index($request);
+});
+
+// Test admin dashboard without admin middleware
+Route::get('/test-admin-dashboard', function () {
+    $controller = new \App\Http\Controllers\Admin\AdminDashboardController();
+    $request = new \Illuminate\Http\Request();
+    return $controller->index($request);
+});
+
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
