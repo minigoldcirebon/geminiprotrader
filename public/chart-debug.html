@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chart Debug Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="/js/admin-one-charts.js"></script>
+    <style>
+        body { background: #1a1a2e; color: white; padding: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; background: #2a2a4e; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Chart Debug Test</h1>
+    
+    <div class="debug-section">
+        <h3>Chart.js Status</h3>
+        <p id="chartjs-status">Checking Chart.js...</p>
+    </div>
+    
+    <div class="debug-section">
+        <h3>AdminOneChartManager Status</h3>
+        <p id="manager-status">Checking AdminOneChartManager...</p>
+    </div>
+    
+    <div class="debug-section">
+        <h3>Test Chart</h3>
+        <canvas id="testChart" width="400" height="200"></canvas>
+    </div>
+    
+    <div class="debug-section">
+        <h3>Console Output</h3>
+        <div id="console-output" style="background: #000; padding: 10px; font-family: monospace;"></div>
+    </div>
+
+    <script>
+        // Capture console output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const consoleOutput = document.getElementById('console-output');
+        
+        function addToConsole(type, message) {
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? '#ff6b6b' : '#4ecdc4';
+            div.textContent = `[${type.toUpperCase()}] ${message}`;
+            consoleOutput.appendChild(div);
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole('log', args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole('error', args.join(' '));
+        };
+
+        // Test Chart.js
+        if (typeof Chart !== 'undefined') {
+            document.getElementById('chartjs-status').textContent = `Chart.js v${Chart.version} loaded successfully`;
+            document.getElementById('chartjs-status').style.color = '#4ecdc4';
+        } else {
+            document.getElementById('chartjs-status').textContent = 'Chart.js failed to load';
+            document.getElementById('chartjs-status').style.color = '#ff6b6b';
+        }
+        
+        // Test AdminOneChartManager
+        setTimeout(() => {
+            if (typeof AdminOneChartManager !== 'undefined') {
+                document.getElementById('manager-status').textContent = 'AdminOneChartManager loaded successfully';
+                document.getElementById('manager-status').style.color = '#4ecdc4';
+                
+                // Test chart creation
+                try {
+                    const manager = new AdminOneChartManager();
+                    console.log('AdminOneChartManager instance created successfully');
+                    
+                    // Create a simple test chart
+                    const ctx = document.getElementById('testChart').getContext('2d');
+                    const testChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['1', '2', '3', '4', '5'],
+                            datasets: [{
+                                label: 'Test Data',
+                                data: [12, 19, 3, 5, 2],
+                                borderColor: '#4ecdc4',
+                                backgroundColor: 'rgba(78, 205, 196, 0.1)'
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                    console.log('Test chart created successfully');
+                } catch (error) {
+                    console.error('Error creating chart manager or test chart:', error);
+                }
+            } else {
+                document.getElementById('manager-status').textContent = 'AdminOneChartManager failed to load';
+                document.getElementById('manager-status').style.color = '#ff6b6b';
+            }
+        }, 500);
+    </script>
+</body>
+</html>

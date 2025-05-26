@@ -1,0 +1,613 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Expert Trading Signals') }}
+        </h2>
+    </x-slot>
+
+    <link rel="stylesheet" href="{{ asset('css/admin-one-charts.css') }}">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <script src="{{ asset('js/admin-one-charts.js') }}"></script>    <style>
+        .dark-bg { 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); 
+            min-height: 100vh;
+        }
+        .signal-card { 
+            background: rgba(30, 41, 59, 0.95); 
+            backdrop-filter: blur(10px); 
+        }
+        .indicator-bar { transition: all 0.3s ease; }
+
+        /* Enhanced Layout and Typography */
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #fff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Improved Chart Card Layout */
+        .chart-section {
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: rgba(30, 41, 59, 0.98);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(75, 85, 99, 0.4);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(75, 85, 99, 0.4);
+        }
+
+        .chart-card-title {
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-area {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(75, 85, 99, 0.2);
+        }
+
+        /* Enhanced Sub-charts Grid */
+        .sub-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .sub-chart-container {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            min-height: 200px;
+        }
+
+        .sub-chart-title {
+            color: #e2e8f0;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Enhanced Signal Info Grid */
+        .signal-info-section {
+            margin-top: 3rem;
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 768px) {
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .info-grid {
+                grid-template-columns: 350px 1fr 300px;
+            }
+        }
+
+        /* Enhanced Signal Card */
+        .main-signal-card {
+            background: rgba(30, 41, 59, 0.98);
+            border: 1px solid rgba(75, 85, 99, 0.4);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Enhanced Trading Stats */
+        .trading-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive Improvements */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 1rem 0.5rem;
+            }
+            
+            .chart-card {
+                padding: 1rem;
+            }
+            
+            .sub-charts-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .trading-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+        }
+
+    </style>    <div class="dark-bg">
+        <div class="page-container">
+            <h1 class="page-title">Expert Trading Signals</h1>
+            
+            @if($latestSignal)
+            <!-- Trading Performance Stats -->
+            <div class="trading-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="mdi mdi-trending-up text-2xl"></i>
+                    </div>
+                    <div class="stat-value">{{ $latestSignal->overall_strength ?? 75 }}%</div>
+                    <div class="stat-label">Signal Strength</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="mdi mdi-chart-line text-2xl"></i>
+                    </div>
+                    <div class="stat-value {{ $latestSignal->profit_loss_percentage >= 0 ? 'text-green-400' : 'text-red-400' }}">
+                        {{ number_format($latestSignal->profit_loss_percentage ?? 0, 2) }}%
+                    </div>
+                    <div class="stat-label">P&L Performance</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="mdi mdi-star text-2xl"></i>
+                    </div>
+                    <div class="stat-value">{{ $latestSignal->confidence_level ?? 3 }}/5</div>
+                    <div class="stat-label">Confidence Level</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="mdi mdi-clock text-2xl"></i>
+                    </div>
+                    <div class="stat-value">{{ $latestSignal->timeframe ?? 'H1' }}</div>
+                    <div class="stat-label">Timeframe</div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <!-- Main Performance Chart -->
+                <div class="chart-card">
+                    <header class="chart-card-header">
+                        <div class="chart-card-title">
+                            <span class="icon"><i class="mdi mdi-finance"></i></span>
+                            {{ $latestSignal->chart_symbol ?? $latestSignal->pair }} Performance Chart
+                        </div>
+                        <div class="chart-card-actions">
+                            <div class="timeframe-buttons">
+                                @foreach(['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1'] as $tf)
+                                <button class="timeframe-btn {{ $tf === ($latestSignal->timeframe ?? 'H1') ? 'active' : '' }}"
+                                        onclick="switchTimeframe('{{ $latestSignal->id }}', '{{ $tf }}')">
+                                    {{ $tf }}
+                                </button>
+                                @endforeach
+                            </div>
+                            <button class="chart-refresh-btn" onclick="refreshChart('{{ $latestSignal->id }}')">
+                                <i class="mdi mdi-refresh"></i>
+                            </button>
+                        </div>
+                    </header>
+                    <div class="chart-area">
+                        <canvas id="mainChart_{{ $latestSignal->id }}" style="height: 400px; width: 100%;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Technical Indicators Charts -->
+                <div class="sub-charts-grid">
+                    <div class="sub-chart-container">
+                        <div class="sub-chart-title">RSI (14) - Relative Strength Index</div>
+                        <canvas id="rsiChart_{{ $latestSignal->id }}" style="height: 150px; width: 100%;"></canvas>
+                    </div>
+
+                    <div class="sub-chart-container">
+                        <div class="sub-chart-title">MACD - Moving Average Convergence Divergence</div>
+                        <canvas id="macdChart_{{ $latestSignal->id }}" style="height: 150px; width: 100%;"></canvas>
+                    </div>
+
+                    <div class="sub-chart-container">
+                        <div class="sub-chart-title">Volume Analysis</div>
+                        <canvas id="volumeChart_{{ $latestSignal->id }}" style="height: 150px; width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signal Information Section -->
+            <div class="signal-info-section">
+                <div class="info-grid">
+                    <div class="stat-value {{ $latestSignal->profit_loss_percentage >= 0 ? 'text-green-400' : 'text-red-400' }}">
+                        {{ number_format($latestSignal->profit_loss_percentage ?? 0, 2) }}%
+                    </div>
+                    <div class="stat-label">P&L Performance</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="mdi mdi-star text-2xl"></i>
+                    </div>
+                    <div class="stat-value">{{ $latestSignal->confidence_level ?? 3 }}/5</div>
+                    <div class="stat-label">Confidence Level</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="mdi mdi-clock text-2xl"></i>
+                    </div>
+                    <div class="stat-value">{{ $latestSignal->timeframe ?? 'H1' }}</div>
+                    <div class="stat-label">Timeframe</div>
+                </div>
+            </div>
+            @endif
+
+            @if($latestSignal)
+            <div class="signal-card rounded-xl border border-gray-600 mb-8 overflow-hidden">
+                <div class="p-6 info-grid">                    <!-- Latest Signal Details -->
+                    <div class="main-signal-card">
+                        <div class="text-center mb-6">
+                            <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-3
+                                @if($latestSignal->signal_type === 'BUY') bg-green-500 text-white
+                                @elseif($latestSignal->signal_type === 'SELL') bg-red-500 text-white
+                                @else bg-yellow-500 text-black @endif">
+                                {{ $latestSignal->signal_type }}
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-2">{{ $latestSignal->chart_symbol ?? $latestSignal->pair }}</h3>
+                            <p class="text-gray-400">{{ $latestSignal->provider_name ?? 'Expert Provider' }}</p>
+                            <div class="mt-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold inline-block">
+                                LATEST SIGNAL
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 rounded-lg p-4 mb-4">
+                            <div class="text-center mb-4">
+                                <div class="text-3xl font-bold mb-2 text-white">{{ $latestSignal->overall_strength ?? 75 }}%</div>
+                                <div class="text-sm text-gray-400">Overall Signal Strength</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-gray-400">Market Trend</span>
+                                    <span class="font-semibold
+                                        @if($latestSignal->current_trend === 'BULLISH') text-green-400
+                                        @elseif($latestSignal->current_trend === 'BEARISH') text-red-400
+                                        @else text-yellow-400 @endif">
+                                        {{ $latestSignal->current_trend ?? 'NEUTRAL' }}
+                                    </span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-3">
+                                    <div class="h-3 rounded-full transition-all duration-500
+                                        @if($latestSignal->current_trend === 'BULLISH') bg-green-500
+                                        @elseif($latestSignal->current_trend === 'BEARISH') bg-red-500
+                                        @else bg-yellow-500 @endif"
+                                        style="width: {{ $latestSignal->overall_strength ?? 75 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technical Analysis -->
+                    <div class="main-signal-card">
+                        <h4 class="font-semibold mb-4 text-white text-lg">Technical Analysis</h4>
+                        <div class="space-y-4">
+                            @forelse($latestSignal->technicalIndicators as $indicator)
+                            <div class="flex items-center justify-between bg-slate-800 rounded-lg p-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-sm font-medium w-16 text-white">{{ $indicator->indicator_name }}</span>
+                                    <div class="flex-1 bg-gray-700 rounded-full h-2 w-24">
+                                        <div class="h-2 rounded-full indicator-bar transition-all duration-300
+                                            @if($indicator->status === 'bullish') bg-green-500
+                                            @elseif($indicator->status === 'bearish') bg-red-500
+                                            @else bg-yellow-500 @endif"
+                                            style="width: {{ $indicator->strength }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-medium text-white">{{ number_format($indicator->value, 2) }}</div>
+                                    <div class="text-xs font-medium
+                                        @if($indicator->status === 'bullish') text-green-400
+                                        @elseif($indicator->status === 'bearish') text-red-400
+                                        @else text-yellow-400 @endif">
+                                        {{ ucfirst($indicator->status) }}
+                                    </div>
+                                </div>
+                            </div>
+                            @empty
+                            <div class="text-sm text-gray-400 text-center py-4">No technical indicators available.</div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Trading Details & Market Status -->
+                    <div class="space-y-4">
+                        <div class="main-signal-card">
+                            <h4 class="font-semibold mb-4 text-white text-lg">Trading Details</h4>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Entry Price:</span>
+                                    <span class="text-white font-medium text-lg">${{ number_format($latestSignal->entry_price, 5) }}</span>
+                                </div>
+                                @if($latestSignal->take_profit)
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Take Profit:</span>
+                                    <span class="text-green-400 font-medium">${{ number_format($latestSignal->take_profit, 5) }}</span>
+                                </div>
+                                @endif
+                                @if($latestSignal->stop_loss)
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Stop Loss:</span>
+                                    <span class="text-red-400 font-medium">${{ number_format($latestSignal->stop_loss, 5) }}</span>
+                                </div>
+                                @endif
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Risk Level:</span>
+                                    <span class="font-medium
+                                        @if($latestSignal->risk_level === 'low') text-green-400
+                                        @elseif($latestSignal->risk_level === 'medium') text-yellow-400
+                                        @else text-red-400 @endif">
+                                        {{ ucfirst($latestSignal->risk_level ?? 'Medium') }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Timeframe:</span>
+                                    <span class="text-white font-medium">{{ $latestSignal->timeframe ?? 'H1' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="main-signal-card">
+                            <h4 class="font-semibold mb-4 text-white text-lg">Market Status</h4>
+                            <div class="text-center">
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-2
+                                    {{ $latestSignal->market_status === 'OPEN' ? 'bg-green-500 text-white' : 'bg-red-500 text-white' }}">
+                                    {{ $latestSignal->market_status ?? 'OPEN' }}
+                                </div>
+                                <div class="text-sm text-gray-400">
+                                    {{ now()->format('H:i T') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="main-signal-card">
+                            <h4 class="font-semibold mb-4 text-white text-lg">Analysis Summary</h4>
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                {{ $latestSignal->analysis_summary ?? 'Technical analysis indicates potential price movement based on current market conditions and indicator convergence.' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+                        <div class="bg-slate-800 rounded-lg p-4">
+                             <h4 class="font-semibold mb-3">Performance</h4>
+                             <div class="space-y-3">
+                                 @if($latestSignal->profit_loss_percentage)
+                                 <div class="flex justify-between items-center">
+                                     <span class="text-gray-400 text-sm">P&L:</span>
+                                     <span class="font-medium {{ $latestSignal->profit_loss_percentage >= 0 ? 'text-green-400' : 'text-red-400' }}">
+                                         {{ number_format($latestSignal->profit_loss_percentage, 2) }}%
+                                     </span>
+                                 </div>
+                                 @endif
+                                 <div class="flex justify-between items-center">
+                                     <span class="text-gray-400 text-sm">Confidence:</span>
+                                     <div class="flex items-center space-x-1">
+                                         @for($i = 1; $i <= 5; $i++)
+                                         <svg class="w-3 h-3 {{ $i <= ($latestSignal->confidence_level ?? 3) ? 'text-yellow-400' : 'text-gray-600' }}"
+                                              fill="currentColor" viewBox="0 0 20 20">
+                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                         </svg>
+                                         @endfor
+                                     </div>
+                                 </div>
+                                 <div class="flex justify-between items-center">
+                                     <span class="text-gray-400 text-sm">Status:</span>
+                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                         @if($latestSignal->signal_result === 'profit') bg-green-100 text-green-800
+                                         @elseif($latestSignal->signal_result === 'loss') bg-red-100 text-red-800
+                                         @else bg-blue-100 text-blue-800 @endif">
+                                         {{ ucfirst($latestSignal->signal_result ?? 'Active') }}
+                                     </span>
+                                 </div>
+                             </div>
+                        </div>
+                         <div class="bg-slate-800 rounded-lg p-4">
+                            <div class="space-y-2">
+                                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+                                    Follow Signal
+                                </button>
+                                <button class="w-full bg-gray-700 hover:bg-gray-600 text-gray-300 py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+            @if($otherSignals && $otherSignals->count() > 0)
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6 text-white border-b border-gray-700 pb-2">Previous Signals</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($otherSignals as $signal)
+                    <div class="signal-card rounded-xl border border-gray-700 p-6 hover:border-gray-500 transition-colors">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-2
+                                @if($signal->signal_type === 'BUY') bg-green-500 text-white
+                                @elseif($signal->signal_type === 'SELL') bg-red-500 text-white
+                                @else bg-yellow-500 text-black @endif">
+                                {{ $signal->signal_type }}
+                            </div>
+                            <h3 class="text-lg font-bold text-white">{{ $signal->chart_symbol ?? $signal->pair }}</h3>
+                            <p class="text-gray-400 text-sm">{{ $signal->provider_name ?? 'Expert Provider' }}</p>
+                        </div>
+                        <div class="space-y-3 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Entry Price:</span>
+                                <span class="text-white font-medium">${{ number_format($signal->entry_price, 5) }}</span>
+                            </div>
+                            @if($signal->take_profit)
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Take Profit:</span>
+                                <span class="text-green-400 font-medium">${{ number_format($signal->take_profit, 5) }}</span>
+                            </div>
+                            @endif
+                            @if($signal->stop_loss)
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Stop Loss:</span>
+                                <span class="text-red-400 font-medium">${{ number_format($signal->stop_loss, 5) }}</span>
+                            </div>
+                            @endif
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Risk Level:</span>
+                                <span class="
+                                    @if($signal->risk_level === 'low') text-green-400
+                                    @elseif($signal->risk_level === 'medium') text-yellow-400
+                                    @else text-red-400 @endif font-medium">
+                                    {{ ucfirst($signal->risk_level ?? 'Medium') }}
+                                </span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-gray-700 hover:bg-gray-600 text-gray-300 py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                    @endforeach
+                </div>
+                <div class="mt-6">
+                    {{ $otherSignals->links() }}
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>    <script>
+        // Initialize Admin One Chart Manager
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing Admin One Charts...');
+            
+            // Create chart manager instance
+            const chartManager = new AdminOneChartManager();
+            
+            @if($latestSignal && $latestSignal->chartDataPoints && $latestSignal->chartDataPoints->count() > 0)
+                try {
+                    const signalId = '{{ $latestSignal->id }}';
+                    const chartData = @json($latestSignal->chartDataPoints->take(80)->values());
+                    
+                    // Initialize all charts using Admin One chart manager
+                    chartManager.initializeCharts(signalId, chartData);
+                    
+                    console.log(`Successfully initialized Admin One charts for signal ${signalId}`);
+                } catch (error) {
+                    console.error('Error initializing Admin One charts:', error);
+                }            @else
+                console.log('No chart data available for latest signal');
+            @endif
+        });
+        
+        // Timeframe switching function
+        function switchTimeframe(signalId, timeframe) {
+            // Update button states
+            document.querySelectorAll(`button[onclick*="${signalId}"]`).forEach(btn => {
+                btn.classList.remove('timeframe-btn-active');
+                btn.classList.add('timeframe-btn-light');
+            });
+            event.target.classList.remove('timeframe-btn-light');
+            event.target.classList.add('timeframe-btn-active');
+            
+            console.log(`Switching to ${timeframe} for signal ${signalId}`);
+            
+            // TODO: Implement AJAX call to fetch new data for the selected timeframe
+            // Example:
+            // fetch(`/api/signals/${signalId}/charts?timeframe=${timeframe}`)
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         const chartManager = new AdminOneChartManager();
+            //         chartManager.initializeCharts(signalId, data.chartDataPoints);
+            //     });
+        }
+
+        // Refresh charts function
+        function refreshCharts(signalId) {
+            console.log(`Refreshing charts for signal ${signalId}`);
+            
+            // TODO: Implement AJAX call to refresh chart data
+            // fetch(`/api/signals/${signalId}/charts/refresh`)
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         const chartManager = new AdminOneChartManager();
+            //         chartManager.initializeCharts(signalId, data.chartDataPoints);
+            //     });
+        }
+    </script>
+</x-app-layout>
