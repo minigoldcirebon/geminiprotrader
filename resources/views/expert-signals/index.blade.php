@@ -1,9 +1,8 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Expert Trading Signals') }}
-        </h2>
-    </x-slot>
+@extends('layouts.admin-one')
+
+@section('title', 'Expert Trading Signals')
+@section('page-title', 'Expert Signals')
+@section('page-heading', 'Expert Trading Signals')
 
     @push('scripts')
     <!-- Chart.js -->
@@ -345,155 +344,190 @@
                 grid-template-columns: 1fr;
             }
         }
-    </style><div class="dark-bg">
-        <div class="page-container">
-            <h1 class="page-title">Expert Trading Signals</h1>            <!-- Statistics Summary (Always Visible) -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="mdi mdi-chart-line text-2xl text-blue-400"></i>
-                    </div>
-                    <div class="stat-value">{{ $stats['total_signals'] ?? 0 }}</div>
-                    <div class="stat-label">Total Signals</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="mdi mdi-trending-up text-2xl text-green-400"></i>
-                    </div>
-                    <div class="stat-value">{{ $stats['profitable_signals'] ?? 0 }}</div>
-                    <div class="stat-label">Profitable</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="mdi mdi-trending-down text-2xl text-red-400"></i>
-                    </div>
-                    <div class="stat-value">{{ $stats['loss_signals'] ?? 0 }}</div>
-                    <div class="stat-label">Loss Signals</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="mdi mdi-clock text-2xl text-yellow-400"></i>
-                    </div>
-                    <div class="stat-value">{{ $stats['pending_signals'] ?? 0 }}</div>
-                    <div class="stat-label">Pending</div>
-                </div>            </div>
-            
-            @if($latestSignal)
-            <!-- Latest Signal Performance Stats -->
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold mb-6 text-white border-b border-gray-700 pb-2">Latest Signal Performance</h2>
-                <div class="trading-stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="mdi mdi-trending-up text-2xl"></i>
-                        </div>
-                        <div class="stat-value">{{ $latestSignal->overall_strength ?? 75 }}%</div>
-                        <div class="stat-label">Signal Strength</div>
-                    </div>
+    </style>
 
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="mdi mdi-chart-line text-2xl"></i>
-                        </div>
-                        <div class="stat-value {{ ($latestSignal->profit_loss_percentage ?? 0) >= 0 ? 'text-green-400' : 'text-red-400' }}">
-                            {{ number_format($latestSignal->profit_loss_percentage ?? 0, 2) }}%
-                        </div>
-                        <div class="stat-label">P&L Performance</div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="mdi mdi-star text-2xl"></i>
-                        </div>
-                        <div class="stat-value">{{ $latestSignal->confidence_level ?? 3 }}/5</div>
-                        <div class="stat-label">Confidence Level</div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="mdi mdi-clock text-2xl"></i>
-                        </div>
-                        <div class="stat-value">{{ $latestSignal->timeframe ?? 'H1' }}</div>
-                        <div class="stat-label">Timeframe</div>
-                    </div>
+@section('content')
+<!-- Statistics Summary -->
+<div class="grid gap-6 grid-cols-1 md:grid-cols-4 mb-6">
+    <div class="card">
+        <div class="card-content">
+            <div class="flex items-center justify-between">
+                <div class="widget-label">
+                    <h3>Total Signals</h3>
+                    <h1>{{ $stats['total_signals'] ?? 0 }}</h1>
                 </div>
+                <span class="icon widget-icon text-blue-500"><i class="mdi mdi-chart-line mdi-48px"></i></span>
             </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-content">
+            <div class="flex items-center justify-between">
+                <div class="widget-label">
+                    <h3>Profitable</h3>
+                    <h1>{{ $stats['profitable_signals'] ?? 0 }}</h1>
                 </div>
+                <span class="icon widget-icon text-green-500"><i class="mdi mdi-trending-up mdi-48px"></i></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-content">
+            <div class="flex items-center justify-between">
+                <div class="widget-label">
+                    <h3>Loss Signals</h3>
+                    <h1>{{ $stats['loss_signals'] ?? 0 }}</h1>
+                </div>
+                <span class="icon widget-icon text-red-500"><i class="mdi mdi-trending-down mdi-48px"></i></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-content">
+            <div class="flex items-center justify-between">
+                <div class="widget-label">
+                    <h3>Pending</h3>
+                    <h1>{{ $stats['pending_signals'] ?? 0 }}</h1>
+                </div>
+                <span class="icon widget-icon text-yellow-500"><i class="mdi mdi-clock mdi-48px"></i></span>
+            </div>
+        </div>
+    </div>
+</div>
+@if($latestSignal)
+<!-- Latest Signal Performance Stats -->
+<div class="card mb-6">
+    <header class="card-header">
+        <p class="card-header-title">
+            <span class="icon"><i class="mdi mdi-signal"></i></span>
+            Latest Signal Performance
+        </p>
+    </header>
+    <div class="card-content">
+        <div class="grid gap-6 grid-cols-1 md:grid-cols-4">
+            <div class="has-text-centered">
+                <span class="icon is-large has-text-info">
+                    <i class="mdi mdi-trending-up mdi-48px"></i>
+                </span>
+                <h1 class="title is-4">{{ $latestSignal->overall_strength ?? 75 }}%</h1>
+                <p class="subtitle is-6">Signal Strength</p>
             </div>
 
-            <!-- Chart Section -->
-            <div class="chart-section">
-                <!-- Main Performance Chart -->
-                <div class="chart-card">
-                    <header class="chart-card-header">
-                        <div class="chart-card-title">
-                            <span class="icon"><i class="mdi mdi-finance"></i></span>
-                            {{ $latestSignal->chart_symbol ?? $latestSignal->pair }} Performance Chart
-                        </div>
-                        <div class="chart-card-actions">
-                            <div class="timeframe-buttons">
-                                @foreach(['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1'] as $tf)
-                                <button class="timeframe-btn {{ $tf === ($latestSignal->timeframe ?? 'H1') ? 'active' : '' }}"
-                                        onclick="switchTimeframe('{{ $latestSignal->id }}', '{{ $tf }}')">
-                                    {{ $tf }}
-                                </button>
-                                @endforeach
-                            </div>
-                            <button class="chart-refresh-btn" onclick="refreshCharts('{{ $latestSignal->id }}')">
-                                <i class="mdi mdi-refresh"></i>
-                            </button>
-                        </div>
-                    </header>                    <div class="chart-area">
-                        <canvas id="mainChart_{{ $latestSignal->id }}"></canvas>
-                    </div>
-                </div>
-
-                <!-- Technical Indicators Charts -->
-                <div class="sub-charts-grid">
-                    <div class="sub-chart-container">
-                        <div class="sub-chart-title">RSI (14) - Relative Strength Index</div>
-                        <div class="sub-chart-canvas-wrapper">
-                            <canvas id="rsiChart_{{ $latestSignal->id }}"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="sub-chart-container">
-                        <div class="sub-chart-title">MACD - Moving Average Convergence Divergence</div>
-                        <div class="sub-chart-canvas-wrapper">
-                            <canvas id="macdChart_{{ $latestSignal->id }}"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="sub-chart-container">
-                        <div class="sub-chart-title">Volume Analysis</div>
-                        <div class="sub-chart-canvas-wrapper">
-                            <canvas id="volumeChart_{{ $latestSignal->id }}"></canvas>
-                        </div>
-                    </div>
-                </div>
+            <div class="has-text-centered">
+                <span class="icon is-large has-text-primary">
+                    <i class="mdi mdi-chart-line mdi-48px"></i>
+                </span>
+                <h1 class="title is-4 {{ ($latestSignal->profit_loss_percentage ?? 0) >= 0 ? 'has-text-success' : 'has-text-danger' }}">
+                    {{ number_format($latestSignal->profit_loss_percentage ?? 0, 2) }}%
+                </h1>
+                <p class="subtitle is-6">P&L Performance</p>
             </div>
 
-            <!-- Signal Information Section -->
-            <div class="signal-info-section">
-                <div class="info-grid">
-                    <!-- Latest Signal Details -->
-                    <div class="main-signal-card">
-                        <div class="text-center mb-6">
-                            <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-3
-                                @if($latestSignal->signal_type === 'BUY') bg-green-500 text-white
-                                @elseif($latestSignal->signal_type === 'SELL') bg-red-500 text-white
-                                @else bg-yellow-500 text-black @endif">
-                                {{ $latestSignal->signal_type }}
-                            </div>
-                            <h3 class="text-2xl font-bold text-white mb-2">{{ $latestSignal->chart_symbol ?? $latestSignal->pair }}</h3>
-                            <p class="text-gray-400">{{ $latestSignal->provider_name ?? 'Expert Provider' }}</p>
-                            <div class="mt-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold inline-block">
-                                LATEST SIGNAL
-                            </div>
-                        </div>
+            <div class="has-text-centered">
+                <span class="icon is-large has-text-warning">
+                    <i class="mdi mdi-star mdi-48px"></i>
+                </span>
+                <h1 class="title is-4">{{ $latestSignal->confidence_level ?? 3 }}/5</h1>
+                <p class="subtitle is-6">Confidence Level</p>
+            </div>
+
+            <div class="has-text-centered">
+                <span class="icon is-large has-text-grey">
+                    <i class="mdi mdi-clock mdi-48px"></i>
+                </span>
+                <h1 class="title is-4">{{ $latestSignal->timeframe ?? 'H1' }}</h1>
+                <p class="subtitle is-6">Timeframe</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Section -->
+<div class="card mb-6">
+    <header class="card-header">
+        <p class="card-header-title">
+            <span class="icon"><i class="mdi mdi-finance"></i></span>
+            {{ $latestSignal->chart_symbol ?? $latestSignal->pair }} Performance Chart
+        </p>
+        <div class="card-header-icon">
+            <div class="buttons has-addons">
+                @foreach(['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1'] as $tf)
+                <button class="button is-small {{ $tf === ($latestSignal->timeframe ?? 'H1') ? 'is-primary' : '' }}"
+                        onclick="switchTimeframe('{{ $latestSignal->id }}', '{{ $tf }}')">
+                    {{ $tf }}
+                </button>
+                @endforeach
+            </div>
+            <button class="button is-small" onclick="refreshCharts('{{ $latestSignal->id }}')">
+                <span class="icon"><i class="mdi mdi-refresh"></i></span>
+            </button>
+        </div>
+    </header>
+    <div class="card-content">
+        <canvas id="mainChart_{{ $latestSignal->id }}"></canvas>
+    </div>
+</div>
+
+<!-- Technical Indicators Charts -->
+<div class="grid gap-6 grid-cols-1 lg:grid-cols-3 mb-6">
+    <div class="card">
+        <header class="card-header">
+            <p class="card-header-title">
+                <span class="icon"><i class="mdi mdi-chart-line"></i></span>
+                RSI (14)
+            </p>
+        </header>
+        <div class="card-content">
+            <canvas id="rsiChart_{{ $latestSignal->id }}"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <header class="card-header">
+            <p class="card-header-title">
+                <span class="icon"><i class="mdi mdi-chart-histogram"></i></span>
+                MACD
+            </p>
+        </header>
+        <div class="card-content">
+            <canvas id="macdChart_{{ $latestSignal->id }}"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <header class="card-header">
+            <p class="card-header-title">
+                <span class="icon"><i class="mdi mdi-chart-bar"></i></span>
+                Volume Analysis
+            </p>
+        </header>
+        <div class="card-content">
+            <canvas id="volumeChart_{{ $latestSignal->id }}"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Signal Information Section -->
+<div class="grid gap-6 grid-cols-1 lg:grid-cols-3 mb-6">
+    <!-- Latest Signal Details -->
+    <div class="card">
+        <header class="card-header">
+            <p class="card-header-title">
+                <span class="icon"><i class="mdi mdi-signal"></i></span>
+                Latest Signal
+            </p>
+        </header>
+        <div class="card-content">
+            <div class="has-text-centered mb-6">
+                <span class="tag is-{{ $latestSignal->signal_type === 'BUY' ? 'success' : ($latestSignal->signal_type === 'SELL' ? 'danger' : 'warning') }} is-large">
+                    {{ $latestSignal->signal_type }}
+                </span>
+                <h3 class="title is-4 mt-3">{{ $latestSignal->chart_symbol ?? $latestSignal->pair }}</h3>
+                <p class="subtitle is-6">{{ $latestSignal->provider_name ?? 'Expert Provider' }}</p>
+            </div>
 
                         <div class="bg-slate-800 rounded-lg p-4 mb-4">
                             <div class="text-center mb-4">
@@ -657,19 +691,20 @@
                         </div>                    </div>
                 </div>
             </div>
-            @else
-            <!-- No Latest Signal - Show Alternative Content -->
-            <div class="mb-8">
-                <div class="bg-yellow-600 bg-opacity-20 border border-yellow-500 rounded-lg p-6 text-center">
-                    <div class="text-yellow-400 text-lg font-semibold mb-2">
-                        <i class="mdi mdi-information-outline mr-2"></i>No Recent Signals Available
-                    </div>
-                    <p class="text-gray-300">
-                        No expert trading signals are currently available. Check back later for new signals.
-                    </p>
-                </div>
-            </div>
-            @endif
+@else
+<!-- No Latest Signal - Show Alternative Content -->
+<div class="card">
+    <div class="card-content">
+        <div class="has-text-centered">
+            <span class="icon is-large has-text-warning">
+                <i class="mdi mdi-information-outline mdi-48px"></i>
+            </span>
+            <h3 class="title is-5 has-text-warning">No Recent Signals Available</h3>
+            <p class="subtitle is-6">No expert trading signals are currently available. Check back later for new signals.</p>
+        </div>
+    </div>
+</div>
+@endif
 
             @if($otherSignals && $otherSignals->count() > 0)
             <div class="mb-8">
@@ -911,4 +946,4 @@
             }
         });
     </script>
-</x-app-layout>
+@endsection
