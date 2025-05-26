@@ -323,8 +323,8 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-            <li class="{{ request()->routeIs('admin.webhook-dashboard') ? 'active' : '' }}">
-                <a href="{{ route('admin.dashboard') }}">
+            <li class="{{ request()->routeIs('admin.webhook-dashboard.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.webhook-dashboard.index') }}">
                     <span class="icon"><i class="mdi mdi-webhook"></i></span>
                     <span>Webhook Dashboard</span>
                 </a>
